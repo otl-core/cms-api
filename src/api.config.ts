@@ -26,10 +26,10 @@ function getBackendApiBaseUrl(): string {
   }
 
   if (process.env.STAGE === "staging") {
-    return "https://api-staging.otl-cms.com";
+    return "https://api-staging.otl.studio";
   }
 
-  return "https://api.otl-cms.com";
+  return "https://api.otl.studio";
 }
 
 /**

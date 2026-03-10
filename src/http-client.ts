@@ -55,11 +55,7 @@ export class HttpClient {
         ...fetchOptions,
         headers,
         signal: controller.signal,
-        ...(process.env.NODE_ENV === "development"
-          ? { cache: "no-store" as const }
-          : nextOptions
-            ? { next: nextOptions }
-            : {}),
+        ...this.resolveCacheOptions(nextOptions),
       });
 
       clearTimeout(timeoutId);
@@ -141,7 +137,7 @@ export class HttpClient {
 
       if (staleResponse.ok) {
         const staleData = await staleResponse.json();
-        console.log(`[HttpClient] Serving stale cache for: ${url}`);
+        console.warn(`[HttpClient] Serving stale cache for: ${url}`);
         return staleData;
       }
     } catch (cacheError) {
@@ -151,6 +147,16 @@ export class HttpClient {
       );
     }
     return null;
+  }
+
+  private resolveCacheOptions(nextOptions?: FetchOptions["next"]) {
+    if (process.env.NODE_ENV === "development") {
+      return { cache: "no-store" as const };
+    }
+    if (nextOptions) {
+      return { next: nextOptions };
+    }
+    return {};
   }
 
   async get<T>(
