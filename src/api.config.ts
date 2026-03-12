@@ -17,19 +17,20 @@ export interface APIConfig {
  * Get backend API base URL (server-side only, never exposed to client)
  */
 function getBackendApiBaseUrl(): string {
+  let url: string;
+
   if (process.env.API_URL) {
-    return process.env.API_URL;
+    url = process.env.API_URL;
+  } else if (process.env.NODE_ENV === "development") {
+    url = "http://localhost:8080";
+  } else if (process.env.STAGE === "staging") {
+    url = "https://api-staging.otl.studio";
+  } else {
+    url = "https://api.otl.studio";
   }
 
-  if (process.env.NODE_ENV === "development") {
-    return "http://localhost:8080";
-  }
-
-  if (process.env.STAGE === "staging") {
-    return "https://api-staging.otl.studio";
-  }
-
-  return "https://api.otl.studio";
+  // Always strip trailing slashes to prevent double-slash in URL paths
+  return url.replace(/\/+$/, "");
 }
 
 /**
